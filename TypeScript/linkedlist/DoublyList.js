@@ -5,6 +5,7 @@ var LinkedListNode = /** @class */ (function () {
     function LinkedListNode(data) {
         this.data = data; // the data value stored in the node
         this.next = null; // a reference to the next node in the list
+        this.back = null; // a reference to the previous node in the list
     }
     return LinkedListNode;
 }());
@@ -39,17 +40,15 @@ var LinkedList = /** @class */ (function () {
     }
     LinkedList.prototype.insertLast = function (data) {
         var newNode = new LinkedListNode(data);
-        if (this.head === null) {
+        if (this.tail === null) {
             this.head = newNode;
             this.tail = newNode;
         }
         else {
-            if (this.tail) {
-                this.tail.next = newNode;
-            }
+            newNode.back = this.tail;
+            this.tail.next = newNode;
             this.tail = newNode;
         }
-        this.length++;
     };
     LinkedList.prototype.begin = function () {
         var itr = new LinkedListIterator(this.head);
@@ -57,11 +56,14 @@ var LinkedList = /** @class */ (function () {
     };
     LinkedList.prototype.printList = function () {
         var output = "";
-        for (var itr = this.begin(); itr.current() !== null; itr.next()) {
-            output += itr.data() + " -> ";
+        if (this.head === null && this.tail === null)
+            output = "Empty";
+        else {
+            for (var itr = this.begin(); itr.current() !== null; itr.next()) {
+                output += itr.data() + " -> ";
+            }
         }
         console.log(output);
-        return output;
     };
     LinkedList.prototype.find = function (data) {
         for (var itr = this.begin(); itr.current() !== null; itr.next()) {
@@ -94,23 +96,21 @@ var LinkedList = /** @class */ (function () {
             console.error("you need to enter data to insert");
             return;
         }
-        // find the node with the given data
+        var newNode = new LinkedListNode(data);
         var node = this.find(nodeData);
         if (!node) {
             console.error("Error: the given node {".concat(nodeData, "} is not on the list"));
             return;
         }
-        // Create a new node with the given data
-        var newNode = new LinkedListNode(data);
-        // Set the next pointer of the new node to the next node of the given node
         newNode.next = node.next;
-        // Set the next pointer of the given node to the new node
+        newNode.back = node;
         node.next = newNode;
-        // If the given node is the tail of the list, update the tail pointer
         if (newNode.next === null) {
             this.tail = newNode;
         }
-        this.length++;
+        else {
+            newNode.next.back = newNode;
+        }
     };
     LinkedList.prototype.insertBefore = function (nodeData, data) {
         if (!nodeData) {
@@ -121,29 +121,27 @@ var LinkedList = /** @class */ (function () {
             console.error("you need to enter data to insert");
             return;
         }
-        // find the node with the given data
+        var newNode = new LinkedListNode(data);
         var node = this.find(nodeData);
         if (!node) {
             console.error("Error: the given node {".concat(nodeData, "} is not on the list"));
             return;
         }
-        var newNode = new LinkedListNode(data);
         newNode.next = node;
-        var parentNode = this.findParent(node);
-        if (!parentNode) {
+        if (node.back === null) {
             this.head = newNode;
         }
         else {
-            parentNode.next = newNode;
+            node.back.next = newNode;
         }
-        this.length++;
+        node.back = newNode;
     };
     LinkedList.prototype.deleteNode = function (nodeData) {
+        // TODO: solve thie possibly 'null' errors in typescript
         if (!nodeData) {
-            console.error("you need to enter Data of the node you want to delete");
+            console.error("you need to enter data of the node you want to delete");
             return;
         }
-        // find the node with the given data
         var node = this.find(nodeData);
         if (!node) {
             console.error("Error: the given node {".concat(nodeData, "} is not on the list"));
@@ -155,19 +153,16 @@ var LinkedList = /** @class */ (function () {
         }
         else if (this.head === node) {
             this.head = this.head.next;
+            this.head.back = null;
+        }
+        else if (node === this.tail) {
+            this.tail = this.tail.back;
+            this.tail.next = null;
         }
         else {
-            var parentNode = this.findParent(node);
-            if (!parentNode)
-                return;
-            if (this.tail === node) {
-                this.tail = parentNode;
-            }
-            else {
-                parentNode.next = node.next;
-            }
+            node.back.next = node.next;
+            node.next.back = node.back;
         }
-        this.length--;
     };
     return LinkedList;
 }());

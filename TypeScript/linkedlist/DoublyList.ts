@@ -1,9 +1,11 @@
 export class LinkedListNode {
     data: any;
     next: LinkedListNode | null;
+    back: LinkedListNode | null;
     constructor(data: any) {
         this.data = data; // the data value stored in the node
         this.next = null; // a reference to the next node in the list
+        this.back = null; // a reference to the previous node in the list
     }
 }
 
@@ -46,17 +48,14 @@ export class LinkedList {
 
     insertLast(data: any): void {
         const newNode = new LinkedListNode(data);
-
-        if (this.head === null) {
+        if (this.tail === null) {
             this.head = newNode;
             this.tail = newNode;
         } else {
-            if (this.tail) {
-                this.tail.next = newNode;
-            }
+            newNode.back = this.tail;
+            this.tail.next = newNode;
             this.tail = newNode;
         }
-        this.length++;
     }
 
     begin() {
@@ -66,11 +65,14 @@ export class LinkedList {
 
     printList() {
         let output = "";
-        for (let itr = this.begin(); itr.current() !== null; itr.next()) {
-            output += itr.data() + " -> ";
+        if (this.head === null && this.tail === null) output = "Empty";
+
+        else {
+            for (let itr = this.begin(); itr.current() !== null; itr.next()) {
+                output += itr.data() + " -> ";
+            }
         }
         console.log(output);
-        return output;
     }
 
     find(data) {
@@ -101,74 +103,62 @@ export class LinkedList {
         if (!nodeData) { console.error("you need to enter data of the node you want to insert after"); return; }
         if (!data) { console.error("you need to enter data to insert"); return; }
 
-        // find the node with the given data
-        const node = this.find(nodeData);
+        let newNode = new LinkedListNode(data);
 
+        let node = this.find(nodeData);
         if (!node) { console.error(`Error: the given node {${nodeData}} is not on the list`); return; }
 
-        // Create a new node with the given data
-        const newNode = new LinkedListNode(data);
-
-        // Set the next pointer of the new node to the next node of the given node
         newNode.next = node.next;
-
-        // Set the next pointer of the given node to the new node
+        newNode.back = node;
         node.next = newNode;
 
-        // If the given node is the tail of the list, update the tail pointer
         if (newNode.next === null) {
-            this.tail = newNode;
+            this.tail = newNode
+        } else {
+            newNode.next.back = newNode;
         }
-
-        this.length++
     }
 
     insertBefore(nodeData, data) {
         if (!nodeData) { console.error("you need to enter data of the node you want to insert before"); return; }
+
         if (!data) { console.error("you need to enter data to insert"); return; }
-
-        // find the node with the given data
-        let node = this.find(nodeData);
-
-        if (!node) { console.error(`Error: the given node {${nodeData}} is not on the list`); return; }
 
         let newNode = new LinkedListNode(data);
 
+        let node = this.find(nodeData);
+        if (!node) { console.error(`Error: the given node {${nodeData}} is not on the list`); return; }
+
         newNode.next = node;
-
-        let parentNode = this.findParent(node);
-
-        if (!parentNode) {
+        if (node.back === null) {
             this.head = newNode;
         } else {
-            parentNode.next = newNode;
+            node.back.next = newNode;
         }
 
-        this.length++
+        node.back = newNode;
     }
 
     deleteNode(nodeData) {
-        if (!nodeData) { console.error("you need to enter Data of the node you want to delete"); return; }
+        // TODO: solve thie possibly 'null' errors in typescript
+        if (!nodeData) { console.error("you need to enter data of the node you want to delete"); return; }
 
-        // find the node with the given data
-        const node = this.find(nodeData);
+        let node = this.find(nodeData);
         if (!node) { console.error(`Error: the given node {${nodeData}} is not on the list`); return; }
+
         if (this.head === this.tail) {
             this.head = null;
             this.tail = null;
         } else if (this.head === node) {
             this.head = this.head.next;
+            this.head.back = null;
+        } else if (node === this.tail) {
+            this.tail = this.tail.back;
+            this.tail.next = null;
         } else {
-            let parentNode = this.findParent(node);
-            if (!parentNode) return;
-
-            if (this.tail === node) {
-                this.tail = parentNode;
-            } else {
-                parentNode.next = node.next;
-            }
+            node.back.next = node.next;
+            node.next.back = node.back;
         }
-
-        this.length--;
     }
+
 }

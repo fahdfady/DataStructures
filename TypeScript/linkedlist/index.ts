@@ -1,4 +1,5 @@
-import { LinkedList, LinkedListIterator, LinkedListNode } from "./SingleLinkedList";
+import { LinkedList, LinkedListIterator, LinkedListNode } from "./DoublyList";
+// import { LinkedList, LinkedListIterator, LinkedListNode } from "./SingleLinkedList";
 
 let singleList = new LinkedList();
 singleList.insertLast(1);
@@ -17,7 +18,10 @@ singleList.printList();
 singleList.insertBefore(3, 21);
 singleList.printList();
 
-singleList.deleteNode(212);
-// singleList.deleteNode(51515);
+singleList.deleteNode(3);
+singleList.deleteNode(2);
+singleList.printList();
+
+singleList.deleteNode(1);
 
 singleList.printList();
