@@ -2,23 +2,41 @@ import { LinkedList } from "./linkedlist"
 
 export class Queue {
 
-    private items: LinkedList;
+    private list: LinkedList;
 
     constructor() {
-        this.items = new LinkedList();
+        this.list = new LinkedList();
     }
 
     enqueue(data) {
-        this.items.insertLast(data);
+        this.list.insertLast(data);
     }
 
-    dequeue(data) {
- 
-        let nodeData = this?.items?.head.data;
-
-        this.items.deleteHead();
-        this.items.insertLast(data);
+    dequeue() {
+        if (!this.list.head) return;
+        let nodeData = this.list.head.data;
+        this.list.deleteHead();
+        return nodeData;
     }
 
+    peek() {
+        if (!this.list.head) return;
+        return this.list.head.data;
+    }
 
+    isEmpty() {
+        if (this.list.length === 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    size() {
+        return this.list.length;
+    }
+
+    print() {
+        this.list.printList();
+    }
 }

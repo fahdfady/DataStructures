@@ -182,16 +182,11 @@ export class LinkedList {
      * @return {void}
      */
     deleteHead() {
-        // If the linked list is empty, return early.
         if (!this.head) return;
-
-        // Find the second node in the list.
-        let secondNode = this.find(this.head.next);
-
-        // Set the head of the linked list to the second node.
-        this.head = secondNode;
-
-        // Decrement the length of the linked list.
+        this.head = this.head.next;
+        if (!this.head) {
+            this.tail = null;
+        }
         this.length--;
     }
 }
