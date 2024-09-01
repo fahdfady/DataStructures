@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var hashtable_1 = require("./hashtable");
+var hashTable = new hashtable_1.HashTable(50);
+hashTable.set('cole', 1);
+hashTable.set('Kendrick', 2);
+console.log(hashTable.get('cole'));
+hashTable.print();
+hashTable.remove("Kendrick");
+hashTable.print();
