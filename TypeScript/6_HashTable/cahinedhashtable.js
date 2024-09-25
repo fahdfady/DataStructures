@@ -4,25 +4,24 @@ exports.ChainedHashTable = void 0;
 var ChainedHashTable = /** @class */ (function () {
     function ChainedHashTable() {
         this.d = 1;
-        this.t = Array.from({ length: Math.pow(2, this.d) }, function () { return []; });
-        this.z = this.randomOddInt(); // Random odd integer
+        this.t = Array.apply(null, Array(Math.pow(2, this.d))).map(function () { return []; });
+        this.z = this.randomOddInt();
         this.n = 0;
     }
-    // Generate a random odd integer
     ChainedHashTable.prototype.randomOddInt = function () {
         var randOdd;
         do {
             randOdd = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
-        } while (randOdd % 2 === 0);
+        } while (randOdd % 2 === 0); // ensure it's odd
         return randOdd;
     };
-    // Hash function using the random odd integer and key
+    // Simple hash function using z (random odd int) and key
     ChainedHashTable.prototype.hash = function (key) {
-        var keyAsString = this.stringToNumber(String(key)); // Convert key to a number
-        var hashValue = Math.abs(this.z * keyAsString); // Ensure positive hash value
-        return hashValue % this.t.length; // Apply modulo with the table size
+        // Use key's string representation and calculate hash
+        var hashValue = this.z * this.stringToNumber(String(key));
+        return hashValue % this.t.length;
     };
-    // Convert string to number (simple sum of char codes)
+    // Convert string to number (helper for the hash function)
     ChainedHashTable.prototype.stringToNumber = function (str) {
         var num = 0;
         for (var i = 0; i < str.length; i++) {
@@ -30,7 +29,6 @@ var ChainedHashTable = /** @class */ (function () {
         }
         return num;
     };
-    // Add an element to the hash table
     ChainedHashTable.prototype.add = function (key, value) {
         if (this.find(key) !== null)
             return false;
@@ -41,57 +39,75 @@ var ChainedHashTable = /** @class */ (function () {
         this.n++;
         return true;
     };
-    // Find an element in the hash table
-    ChainedHashTable.prototype.find = function (key) {
-        var index = this.hash(key);
-        var bucket = this.t[index];
-        for (var _i = 0, bucket_1 = bucket; _i < bucket_1.length; _i++) {
-            var _a = bucket_1[_i], bucketKey = _a[0], bucketValue = _a[1];
-            if (bucketKey === key) {
-                return bucketValue;
-            }
-        }
-        return null;
-    };
-    // Remove an element from the hash table
     ChainedHashTable.prototype.remove = function (key, value) {
+        if (!key)
+            return false;
         var index = this.hash(key);
         var bucket = this.t[index];
         for (var i = 0; i < bucket.length; i++) {
             var _a = bucket[i], bucketKey = _a[0], bucketValue = _a[1];
             if (bucketKey === key && bucketValue === value) {
-                bucket.splice(i, 1);
-                this.n--;
+                bucket.splice(i, 1); // Remove the key-value pair from the bucket
+                this.n--; // Decrement the count of elements
                 return true;
             }
         }
         return false;
     };
-    // Resize the hash table when load factor exceeds threshold
+    ChainedHashTable.prototype.removeBucket = function (key) {
+        if (!key)
+            return false; // Check if the key is valid
+        var removed = false;
+        // Step 1: Compute the hash value to locate the correct bucket
+        var index = this.hash(key);
+        // Step 2: Find the key-value pair in the bucket
+        var bucket = this.t[index]; // Access the bucket where the key might be stored
+        for (var i = 0; i < bucket.length; i++) {
+            var _a = bucket[i], bucketKey = _a[0], bucketValue = _a[1];
+            // Step 3: Check if the key matches
+            if (bucketKey === key) {
+                bucket.splice(i, 1); // Remove the key-value pair
+                this.n--; // Decrement the count of elements
+                removed = true;
+                i--; // Decrease index since we removed an element, so the next element shifts
+            }
+        }
+        // If we reach here, the key was not found
+        return false;
+    };
     ChainedHashTable.prototype.resize = function () {
         this.d++;
-        var newTable = Array.from({ length: Math.pow(2, this.d) }, function () { return []; });
+        var newTable = Array.apply(null, Array(Math.pow(2, this.d))).map(function () { return []; });
         for (var _i = 0, _a = this.t; _i < _a.length; _i++) {
             var bucket = _a[_i];
-            for (var _b = 0, bucket_2 = bucket; _b < bucket_2.length; _b++) {
-                var _c = bucket_2[_b], key = _c[0], value = _c[1];
-                var idx = this.hash(key); // Rehash keys for new table
-                newTable[idx].push([key, value]);
+            for (var _b = 0, bucket_1 = bucket; _b < bucket_1.length; _b++) {
+                var _c = bucket_1[_b], key = _c[0], value = _c[1];
+                var idx = this.hash(key); // recompute the hash value for the new table
+                newTable[idx].push([key, value]); // insert element into the new table
             }
         }
         this.t = newTable;
     };
-    // Print the current state of the hash table
+    // linear search
+    ChainedHashTable.prototype.find = function (key) {
+        var index = this.t[this.hash(key)];
+        for (var y in index) {
+            // let indexY = this.t[this.hash(y)];
+            if (y === key) {
+                return y;
+            }
+        }
+        return null;
+    };
     ChainedHashTable.prototype.print = function () {
         this.t.forEach(function (bucket, index) {
             var bucketStr = bucket.map(function (_a) {
                 var key = _a[0], value = _a[1];
                 return "[".concat(key, ", ").concat(value, "]");
             }).join(', ');
-            console.log("Bucket ".concat(index, ": ").concat(bucketStr));
+            console.log("Bucket ".concat(index, ": ").concat(bucketStr, " "));
         });
     };
     return ChainedHashTable;
 }());
 exports.ChainedHashTable = ChainedHashTable;
-"\n";
