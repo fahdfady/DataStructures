@@ -6,7 +6,12 @@ var HashTable = /** @class */ (function () {
         this.size = size;
         this.table = new Array(this.size);
     }
-    // A simple hash function for demonstration purposes
+    /**
+     * A simple hash function for demonstration purposes.
+     * This function takes in a key of type K and returns a hash value
+     * between 0 and size - 1.
+     * @param key The key to be hashed.
+     */
     HashTable.prototype.hash = function (key) {
         var hashValue = 0;
         var keyStr = String(key);

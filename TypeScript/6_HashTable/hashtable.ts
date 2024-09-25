@@ -7,7 +7,12 @@ export class HashTable<K, V> {
         this.table = new Array(this.size);
     }
 
-    // A simple hash function for demonstration purposes
+    /**
+     * A simple hash function for demonstration purposes.
+     * This function takes in a key of type K and returns a hash value
+     * between 0 and size - 1.
+     * @param key The key to be hashed.
+     */
     private hash(key: K): number {
         let hashValue = 0;
         const keyStr = String(key);
